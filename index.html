@@ -493,7 +493,7 @@
         // --- Mock Data for Other Groups' Submissions (Static) ---
         // In a real application, this would come from a backend database.
         const mockOtherSubmissions = [
-            { groupName: 'Kelompok A_1', programSubmitted: false },
+            { groupName: 'Kelompok A_1', programSubmitted: true },
             { groupName: 'Kelompok A_2', programSubmitted: false },
             { groupName: 'Kelompok A_3', programSubmitted: false },
             { groupName: 'Kelompok B_1', programSubmitted: false },
@@ -753,7 +753,7 @@
             // The "last updated" info will now reflect the last time this mock list was "generated" or a placeholder.
             // Since there's no real backend, we'll just show a static "N/A" or the current time if preferred.
             // For now, let's keep it as a static "N/A" as there's no dynamic update source.
-            lastUpdatedInfo.textContent = 'Terakhir diperbarui: 11:57 WIB, 26 Mei 2025'; // Static placeholder for last updated info
+            lastUpdatedInfo.textContent = 'Terakhir diperbarui: 12:24 WIB, 26 Mei 2025'; // Static placeholder for last updated info
         }
 
         /**
