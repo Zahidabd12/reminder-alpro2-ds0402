@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reminder - TuBes & Ujian</title>
     <style>
+        /* General Styles */
         * {
             margin: 0;
             padding: 0;
@@ -16,14 +17,18 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            flex-grow: 1;
         }
 
+        /* Header Styles */
         .header {
             text-align: center;
             margin-bottom: 40px;
@@ -41,12 +46,14 @@
             font-size: 1.1rem;
         }
 
+        /* Reminders Grid */
         .reminders-grid {
             display: grid;
             gap: 20px;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         }
 
+        /* Reminder Card Styles */
         .reminder-card {
             background: rgba(255,255,255,0.95);
             border-radius: 15px;
@@ -65,15 +72,15 @@
         }
 
         .reminder-card.urgent {
-            border-left: 5px solid #e74c3c;
+            border-left: 5px solid #e74c3c; /* Red */
         }
 
         .reminder-card.warning {
-            border-left: 5px solid #f39c12;
+            border-left: 5px solid #f39c12; /* Orange */
         }
 
         .reminder-card.normal {
-            border-left: 5px solid #27ae60;
+            border-left: 5px solid #27ae60; /* Green */
         }
 
         .reminder-title {
@@ -162,13 +169,15 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            max-width: 500px; /* Increased max-width for more content */
+            max-width: 500px;
             width: 90%;
-            text-align: left; /* Align text to left for readability */
+            text-align: left;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             transform: scale(0.8);
             transition: transform 0.3s ease;
             position: relative;
+            max-height: 90vh; /* Limit modal height */
+            overflow-y: auto; /* Enable scrolling for long content */
         }
 
         .modal-overlay.show {
@@ -184,7 +193,7 @@
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 20px;
-            text-align: center; /* Center modal title */
+            text-align: center;
         }
 
         .modal-description {
@@ -200,26 +209,30 @@
 
         .checklist-item {
             display: flex;
-            align-items: flex-start; /* Align checkbox and text at start */
+            align-items: flex-start;
             margin-bottom: 10px;
-            cursor: pointer; /* Indicate it's clickable */
+            cursor: pointer;
         }
 
         .checklist-item input[type="checkbox"] {
             margin-right: 10px;
-            transform: scale(1.2); /* Make checkbox a bit larger */
-            margin-top: 2px; /* Adjust vertical alignment */
+            transform: scale(1.2);
+            margin-top: 2px;
         }
 
         .checklist-item label {
-            flex-grow: 1; /* Allow label to take available space */
+            flex-grow: 1;
             color: #333;
             font-size: 1rem;
         }
 
         .modal-buttons-container {
-            text-align: center; /* Center buttons */
+            text-align: center;
             margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px; /* Gap between buttons */
         }
 
         .modal-button {
@@ -231,9 +244,8 @@
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            margin: 0 8px; /* Adjusted margin */
             transition: all 0.3s ease;
-            text-decoration: none;
+            text-decoration: none; /* Ensure it looks like a button, not a typical link */
             display: inline-block;
         }
 
@@ -265,6 +277,79 @@
             color: #2c3e50;
         }
 
+        /* Footer Styles */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Submission Section Styles */
+        .submission-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .submission-section h3 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .submission-list {
+            list-style: none;
+            padding: 0;
+            max-height: 150px; /* Limit height for scroll */
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .submission-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            color: #444;
+        }
+
+        .submission-list li:last-child {
+            border-bottom: none;
+        }
+
+        .submission-status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .submission-status-dot.submitted {
+            background-color: #27ae60; /* Green */
+        }
+
+        .submission-status-dot.pending {
+            background-color: #95a5a6; /* Grey */
+        }
+
+        .last-updated {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 15px;
+        }
+
+        /* Responsive Adjustments */
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 2rem;
@@ -295,12 +380,19 @@
             </div>
     </div>
 
+    <footer class="footer">
+        by Zahid PJ Matkul
+    </footer>
+
     <div class="modal-overlay" id="modal">
         <div class="modal-content">
             <button class="close-button" id="closeModal">&times;</button>
             <div class="modal-title" id="modalTitle"></div>
             <div class="modal-description" id="modalDescription"></div>
             <div class="checklist" id="modalChecklist"></div>
+            
+            <div id="tuBesSubmissionSection"></div>
+
             <div class="modal-buttons-container" id="modalButtons"></div>
         </div>
     </div>
@@ -324,9 +416,13 @@
                     'Tautan GitHub: Sertakan tautan ke repository GitHub yang berisi kode program. (GitHub Link: Provide the link to the GitHub repository containing the source code.)',
                     'Referensi: Daftar referensi yang digunakan selama pengerjaan tugas. (References: A list of references used during the project development.)'
                 ],
-                modalButtons: [
-                    { text: 'Submit TuBes', type: 'primary', action: 'link', url: 'https://lms.telkomuniversity.ac.id/mod/assign/view.php?id=930852'}
-                ]
+                // New structure for TuBes submission details
+                modalSubmission: {
+                    types: [
+                        { key: 'report', label: 'Laporan', buttonText: 'Submit Laporan', url: 'https://lms.telkomuniversity.ac.id/mod/assign/view.php?id=930852' },
+                        { key: 'program', label: 'Program (.exe)', buttonText: 'Submit Program (.exe)', url: 'https://telkomuniversityofficial-my.sharepoint.com/:f:/g/personal/bdssby_telkomuniversity_ac_id/EswpqjAko_JKp9U2m-bsK3sB75mQHV7LScpzk3cEh6ga8g?e=0gx7vk' } // Placeholder URL
+                    ]
+                }
             },
             {
                 id: 2,
@@ -340,9 +436,10 @@
                     'Pahami Algoritma Searching dan Sorting secara mendalam.',
                     'Siapkan slide presentasi yang menarik dan mudah dipahami.',
                     'Latih penyampaian materi dengan baik.',
+                    'Siapkan demo aplikasi (jika ada).'
                 ],
                 modalButtons: [
-                    { text: 'Link Materi Searching & Sorting', type: 'primary', action: 'link', url: 'https://www.google.com/search?q=algoritma+searching+dan+sorting' }
+                    { text: 'Link Materi Searching & Sorting', type: 'primary', action: 'link', url: '#' }
                 ]
             },
             {
@@ -361,11 +458,64 @@
                     'Pastikan anda mengerjakan dengan jujur dan tidak mencontek.',
                 ],
                 modalButtons: [
-                    { text: 'Link Modul Praktikum', type: 'primary', action: 'link', url: 'https://www.google.com/search?q=modul+ujian+praktikum' }
+                    { text: 'Link Modul Praktikum', type: 'primary', action: 'link', url: '#' }
                 ]
             }
         ];
 
+        // Global variable to store the ID of the currently open modal reminder
+        window.currentModalReminderId = null;
+
+        // --- Local Storage Functions for TuBes Submission Status ---
+        const LOCAL_STORAGE_KEY = 'tuBesSubmissionStatus';
+
+        /**
+         * Retrieves the current user's TuBes submission status from localStorage.
+         * @returns {object} An object with reportSubmitted, programSubmitted, and lastUpdated properties.
+         */
+        function getMyTuBesSubmissionStatus() {
+            const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+            return stored ? JSON.parse(stored) : { reportSubmitted: false, programSubmitted: false, lastUpdated: null };
+        }
+
+        /**
+         * Updates the current user's TuBes submission status in localStorage.
+         * This function is now simplified as per user request to not automatically update status on click.
+         * @param {string} type - 'report' or 'program'.
+         */
+        function updateMyTuBesSubmissionStatus(type) {
+            // Removed automatic status update from localStorage.
+            // The user will manually update status.
+            // Keeping this function as a placeholder if future manual updates are desired via console.
+            console.log(`Navigating to submit ${type}. Status update is now manual.`);
+        }
+
+        // --- Mock Data for Other Groups' Submissions (Static) ---
+        // In a real application, this would come from a backend database.
+        const mockOtherSubmissions = [
+            { groupName: 'Kelompok A_1', programSubmitted: false },
+            { groupName: 'Kelompok A_2', programSubmitted: false },
+            { groupName: 'Kelompok A_3', programSubmitted: false },
+            { groupName: 'Kelompok B_1', programSubmitted: false },
+            { groupName: 'Kelompok B_2', programSubmitted: false },
+            { groupName: 'Kelompok B_3', programSubmitted: false },
+            { groupName: 'Kelompok C_1', programSubmitted: false },
+            { groupName: 'Kelompok C_2', programSubmitted: false },
+            { groupName: 'Kelompok C_3', programSubmitted: false },
+            { groupName: 'Kelompok D_1', programSubmitted: false },
+            { groupName: 'Kelompok D_2', programSubmitted: false },
+            { groupName: 'Kelompok D_3', programSubmitted: false },
+            { groupName: 'Kelompok E_1', programSubmitted: false },
+            { groupName: 'Kelompok E_2', programSubmitted: false },
+            { groupName: 'Kelompok E_3', programSubmitted: false } 
+        ];
+
+        /**
+         * Formats a date string and time string into a human-readable format.
+         * @param {string} dateStr - Date in 'YYYY-MM-DD' format.
+         * @param {string} timeStr - Time in 'HH:MM' format.
+         * @returns {string} Formatted date string (e.g., "Senin, 26 Mei 2025 - 16:30 WIB").
+         */
         function formatDate(dateStr, timeStr) {
             const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             const months = [
@@ -373,20 +523,39 @@
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
             ];
             
-            // Adjust date and time to be interpreted as WIB (GMT+7)
-            const date = new Date(dateStr + 'T' + timeStr + ':00+07:00'); // Explicitly set timezone to WIB
-            const dayName = days[date.getDay()];
-            const day = date.getDate();
-            const month = months[date.getMonth()];
-            const year = date.getFullYear();
-            const time = timeStr + ' WIB';
+            // Create a Date object from the provided date and time
+            const targetDate = new Date(`${dateStr}T${timeStr}:00`);
+
+            // Adjust year to current year if the event is in the past for this year,
+            // or next year if it's still in the past after adjusting to current year.
+            const now = new Date();
+            if (targetDate.getFullYear() < now.getFullYear()) {
+                targetDate.setFullYear(now.getFullYear());
+            }
+            if (targetDate.getMonth() < now.getMonth() || (targetDate.getMonth() === now.getMonth() && targetDate.getDate() < now.getDate())) {
+                 if (targetDate.getFullYear() === now.getFullYear()) { // Only increment year if it's the current year
+                    targetDate.setFullYear(now.getFullYear() + 1);
+                }
+            }
+
+
+            const dayName = days[targetDate.getDay()];
+            const day = targetDate.getDate();
+            const month = months[targetDate.getMonth()];
+            const year = targetDate.getFullYear();
+            const time = targetDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
             
             return `${dayName}, ${day} ${month} ${year} - ${time}`;
         }
 
+        /**
+         * Calculates the time remaining until a target date.
+         * @param {Date} targetDate - The target Date object.
+         * @returns {object} An object containing days, hours, minutes, seconds, and an expired flag.
+         */
         function getTimeRemaining(targetDate) {
             const now = new Date();
-            const target = new Date(targetDate);
+            const target = new Date(targetDate); // Ensure target is a Date object
             const diff = target - now;
 
             if (diff <= 0) {
@@ -401,33 +570,49 @@
             return { days, hours, minutes, seconds, expired: false };
         }
 
+        /**
+         * Determines the CSS class for a reminder card based on time remaining.
+         * @param {Date} targetDate - The target Date object.
+         * @returns {string} CSS class ('urgent', 'warning', 'normal').
+         */
         function getCardClass(targetDate) {
             const now = new Date();
             const target = new Date(targetDate);
             const diff = target - now;
             const hoursRemaining = diff / (1000 * 60 * 60);
 
-            if (diff <= 0) return 'urgent'; // Merah jika sudah lewat
-            if (hoursRemaining <= 24) return 'warning'; // Oranye jika kurang dari 24 jam
-            return 'normal'; // Hijau jika masih lama
+            if (diff <= 0) return 'urgent'; // Red if passed
+            if (hoursRemaining <= 24) return 'warning'; // Orange if less than 24 hours
+            return 'normal'; // Green if still long
         }
 
+        /**
+         * Determines the status text and CSS class for the status button.
+         * @param {Date} targetDate - The target Date object.
+         * @returns {object} An object containing the CSS class and text.
+         */
         function getStatusInfo(targetDate) {
             const now = new Date();
             const target = new Date(targetDate);
             const diff = target - now;
-            const hoursRemaining = diff / (1000 * 60 * 60);
             
-            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, -1); // End of today
+            // Check if target is today (any time today)
+            const isToday = target.getDate() === now.getDate() &&
+                            target.getMonth() === now.getMonth() &&
+                            target.getFullYear() === now.getFullYear();
 
             if (diff <= 0) return { class: 'expired', text: 'BERAKHIR' };
             
-            if (target >= startOfToday && target <= endOfToday) return { class: 'today', text: 'HARI INI' };
+            if (isToday) return { class: 'today', text: 'HARI INI' };
             
             return { class: 'upcoming', text: 'MENDATANG' };
         }
 
+        /**
+         * Formats the countdown time for display.
+         * @param {object} timeObj - Object from getTimeRemaining.
+         * @returns {object} Formatted time string and label.
+         */
         function formatCountdown(timeObj) {
             if (timeObj.expired) {
                 return {
@@ -453,17 +638,30 @@
             return { time: timeStr, label: labelStr };
         }
 
+        /**
+         * Displays the modal with reminder details.
+         * @param {object} reminder - The reminder object.
+         */
         function showModal(reminder) {
             const modal = document.getElementById('modal');
             const modalTitle = document.getElementById('modalTitle');
             const modalDescription = document.getElementById('modalDescription');
             const modalChecklist = document.getElementById('modalChecklist');
             const modalButtons = document.getElementById('modalButtons');
+            const tuBesSubmissionSection = document.getElementById('tuBesSubmissionSection');
+
+            // Store the ID of the currently open reminder
+            window.currentModalReminderId = reminder.id;
 
             modalTitle.textContent = reminder.modalTitle;
-            modalDescription.textContent = reminder.modalDescription || ''; // Display description if exists
+            modalDescription.textContent = reminder.modalDescription || '';
 
+            // Clear previous content
             modalChecklist.innerHTML = '';
+            modalButtons.innerHTML = '';
+            tuBesSubmissionSection.innerHTML = ''; // Clear TuBes specific section
+
+            // Populate checklist items
             if (reminder.checklistItems && reminder.checklistItems.length > 0) {
                 reminder.checklistItems.forEach((item, index) => {
                     const checklistItemDiv = document.createElement('div');
@@ -472,8 +670,6 @@
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.id = `checklist-item-${reminder.id}-${index}`;
-                    // You might want to store checkbox state in localStorage
-                    // For now, it's just a visual toggle
                     
                     const label = document.createElement('label');
                     label.htmlFor = `checklist-item-${reminder.id}-${index}`;
@@ -485,37 +681,111 @@
                 });
             }
 
-            modalButtons.innerHTML = '';
-            reminder.modalButtons.forEach(button => {
-                if (button.action === 'link') {
+            // Handle TuBes specific submission section
+            if (reminder.id === 1 && reminder.modalSubmission) { // If it's TuBes reminder
+                // No longer checking mySubmissionStatus for button text or class
+                const submissionButtonsHtml = reminder.modalSubmission.types.map(type => {
+                    return `
+                        <a href="${type.url}" target="_blank" class="modal-button">
+                            ${type.buttonText}
+                        </a>
+                    `;
+                }).join('');
+
+                const submissionHtml = `
+                    <div class="submission-section">
+                        <h3>Link Pengumpulan</h3>
+                        <div class="modal-buttons-container">
+                            ${submissionButtonsHtml}
+                        </div>
+                        <h3 style="margin-top: 20px;">Kelompok yang Sudah Mengumpulkan Program (.exe)</h3>
+                        <ul class="submission-list" id="submittedGroupsList">
+                            </ul>
+                        <div class="last-updated" id="lastUpdatedInfo"></div>
+                    </div>
+                `;
+                tuBesSubmissionSection.innerHTML = submissionHtml;
+                renderSubmittedGroups(); // Render initial list
+            } else {
+                // For other reminders, use generic modal buttons (now all links)
+                reminder.modalButtons.forEach(button => {
                     const link = document.createElement('a');
                     link.href = button.url;
                     link.target = '_blank';
                     link.className = `modal-button ${button.type === 'secondary' ? 'secondary' : ''}`;
                     link.textContent = button.text;
+                    // If it was originally a 'button' action, add a generic alert for demonstration
+                    if (button.action === 'button') {
+                        link.onclick = () => { alert(`${button.text} diklik!`); return true; };
+                    }
                     modalButtons.appendChild(link);
-                } else {
-                    const btn = document.createElement('button');
-                    btn.className = `modal-button ${button.type === 'secondary' ? 'secondary' : ''}`;
-                    btn.textContent = button.text;
-                    btn.onclick = () => {
-                        alert(`${button.text} diklik!`);
-                        // You can add more complex logic here, e.g., submitting form
-                    };
-                    modalButtons.appendChild(btn);
-                }
-            });
+                });
+            }
 
             modal.classList.add('show');
         }
 
+        /**
+         * Renders the list of submitted groups and last updated info in the modal.
+         * This function now uses mock data for 'others'.
+         */
+        function renderSubmittedGroups() {
+            const submittedGroupsList = document.getElementById('submittedGroupsList');
+            const lastUpdatedInfo = document.getElementById('lastUpdatedInfo');
+            if (!submittedGroupsList || !lastUpdatedInfo) return; // Ensure elements exist
+
+            submittedGroupsList.innerHTML = '';
+            
+            // Add mock other submissions
+            mockOtherSubmissions.forEach(submission => {
+                const li = document.createElement('li');
+                // Only show program status for mock groups
+                const programStatus = submission.programSubmitted ? '<span class="submission-status-dot submitted"></span>Program' : '<span class="submission-status-dot pending"></span>Program';
+                
+                li.innerHTML = `
+                    <span>${submission.groupName}</span>
+                    <span>${programStatus}</span>
+                `;
+                submittedGroupsList.appendChild(li);
+            });
+
+            // The "last updated" info will now reflect the last time this mock list was "generated" or a placeholder.
+            // Since there's no real backend, we'll just show a static "N/A" or the current time if preferred.
+            // For now, let's keep it as a static "N/A" as there's no dynamic update source.
+            lastUpdatedInfo.textContent = 'Terakhir diperbarui: N/A';
+        }
+
+        /**
+         * Closes the modal.
+         */
         function closeModal() {
             const modal = document.getElementById('modal');
             modal.classList.remove('show');
+            window.currentModalReminderId = null; // Reset current modal ID
         }
 
+        /**
+         * Creates the HTML structure for a single reminder card.
+         * @param {object} reminder - The reminder object.
+         * @returns {string} HTML string for the reminder card.
+         */
         function createReminderCard(reminder) {
-            const targetDate = new Date(reminder.date + 'T' + reminder.time + ':00+07:00'); // Explicitly set timezone for consistency
+            // Create a Date object from the reminder's date and time
+            const targetDate = new Date(`${reminder.date}T${reminder.time}:00`);
+
+            // Adjust year to current year if the event is in the past for this year,
+            // or next year if it's still in the past after adjusting to current year.
+            const now = new Date();
+            if (targetDate.getFullYear() < now.getFullYear()) {
+                targetDate.setFullYear(now.getFullYear());
+            }
+            if (targetDate.getMonth() < now.getMonth() || (targetDate.getMonth() === now.getMonth() && targetDate.getDate() < now.getDate())) {
+                 if (targetDate.getFullYear() === now.getFullYear()) { // Only increment year if it's the current year
+                    targetDate.setFullYear(now.getFullYear() + 1);
+                }
+            }
+
+
             const timeRemaining = getTimeRemaining(targetDate);
             const cardClass = getCardClass(targetDate);
             const statusInfo = getStatusInfo(targetDate);
@@ -537,9 +807,19 @@
             `;
         }
 
+        /**
+         * Updates all reminder cards on the page.
+         */
         function updateReminders() {
             const container = document.getElementById('remindersContainer');
             container.innerHTML = reminders.map(reminder => createReminderCard(reminder)).join('');
+        }
+
+        // --- Initialization ---
+        // Generate a unique user ID if not already present (for localStorage simulation)
+        // This is kept for consistency with previous versions, though its display is removed.
+        if (!localStorage.getItem('myUserId')) {
+            localStorage.setItem('myUserId', 'user-' + Math.random().toString(36).substring(2, 10));
         }
 
         // Event listeners
@@ -557,7 +837,7 @@
             }
         });
 
-        // Update setiap detik
+        // Initial update and set interval for real-time countdown
         updateReminders();
         setInterval(updateReminders, 1000);
     </script>
