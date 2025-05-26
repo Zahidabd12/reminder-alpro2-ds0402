@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminder - TuBes & Ujian</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+        }
+
+        .reminders-grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
+        .reminder-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .reminder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .reminder-card.urgent {
+            border-left: 5px solid #e74c3c;
+        }
+
+        .reminder-card.warning {
+            border-left: 5px solid #f39c12;
+        }
+
+        .reminder-card.normal {
+            border-left: 5px solid #27ae60;
+        }
+
+        .reminder-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reminder-date {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .countdown-container {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .countdown-time {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .countdown-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .status-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-button.today {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .status-button.upcoming {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .status-button.expired {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .status-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px; /* Increased max-width for more content */
+            width: 90%;
+            text-align: left; /* Align text to left for readability */
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center; /* Center modal title */
+        }
+
+        .modal-description {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .checklist {
+            margin-bottom: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start; /* Align checkbox and text at start */
+            margin-bottom: 10px;
+            cursor: pointer; /* Indicate it's clickable */
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2); /* Make checkbox a bit larger */
+            margin-top: 2px; /* Adjust vertical alignment */
+        }
+
+        .checklist-item label {
+            flex-grow: 1; /* Allow label to take available space */
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .modal-buttons-container {
+            text-align: center; /* Center buttons */
+            margin-top: 25px;
+        }
+
+        .modal-button {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 8px; /* Adjusted margin */
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .modal-button.secondary {
+            background: #95a5a6;
+        }
+
+        .modal-button.secondary:hover {
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.4);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .close-button:hover {
+            color: #2c3e50;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .reminders-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .countdown-time {
+                font-size: 1.4rem;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Reminder TuBes & Ujian</h1>
+            <p>Jangan sampai terlewat jadwal penting Anda!</p>
+        </div>
+
+        <div class="reminders-grid" id="remindersContainer">
+            </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <button class="close-button" id="closeModal">&times;</button>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-description" id="modalDescription"></div>
+            <div class="checklist" id="modalChecklist"></div>
+            <div class="modal-buttons-container" id="modalButtons"></div>
+        </div>
+    </div>
+
+    <script>
+        // Data pengingat
+        const reminders = [
+            {
+                id: 1,
+                title: '📝 Pengumpulan TuBes',
+                date: '2025-05-26', // Current date for testing: Monday, May 26, 2025
+                time: '16:30',
+                emoji: '📝',
+                modalTitle: 'Pengumpulan TuBes',
+                modalDescription: 'Mahasiswa mengumpulkan laporan lengkap dengan source code. (Students submit a report along with the source code.)',
+                checklistItems: [
+                    'Pendahuluan: Ringkasan Tugas Besar (TuBes) dan tujuan. (Introduction: Summary of the Final Project (TuBes) and its objectives.)',
+                    'Deskripsi TuBes: Uraian lengkap aplikasi yang dikembangkan, termasuk fitur-fitur yang digunakan. (Project Description: A detailed explanation of the developed application, including the features used.)',
+                    'Tantangan dan Solusi: Kendala yang dihadapi dan cara mengatasinya. (Challenges and Solutions: Difficulties encountered and how they were addressed.)',
+                    'Kesimpulan dan Rekomendasi: Kesimpulan dari hasil TuBes dan saran pengembangan lebih lanjut. (Conclusion and Recommendations: Summary of project outcomes and suggestions for future improvements.)',
+                    'Tautan GitHub: Sertakan tautan ke repository GitHub yang berisi kode program. (GitHub Link: Provide the link to the GitHub repository containing the source code.)',
+                    'Referensi: Daftar referensi yang digunakan selama pengerjaan tugas. (References: A list of references used during the project development.)'
+                ],
+                modalButtons: [
+                    { text: 'Submit TuBes', type: 'primary', action: 'link', url: 'https://lms.telkomuniversity.ac.id/mod/assign/view.php?id=930852'}
+                ]
+            },
+            {
+                id: 2,
+                title: '🎤 Presentasi TuBes', 
+                date: '2025-05-27', // Current date for testing: Tuesday, May 27, 2025
+                time: '13:30', // Corrected time based on prompt
+                emoji: '🎤',
+                modalTitle: 'Presentasi TuBes',
+                modalDescription: 'Persiapkan diri Anda untuk presentasi yang efektif!',
+                checklistItems: [
+                    'Pahami Algoritma Searching dan Sorting secara mendalam.',
+                    'Siapkan slide presentasi yang menarik dan mudah dipahami.',
+                    'Latih penyampaian materi dengan baik.',
+                    'Siapkan demo aplikasi (jika ada).'
+                ],
+                modalButtons: [
+                    { text: 'Link Materi Searching & Sorting', type: 'primary', action: 'link', url: 'https://www.google.com/search?q=algoritma+searching+dan+sorting' }
+                ]
+            },
+            {
+                id: 3,
+                title: '📖 Ujian Praktikum',
+                date: '2025-05-28', // Current date for testing: Wednesday, May 28, 2025
+                time: '15:30',
+                emoji: '📖',
+                modalTitle: 'Ujian Praktikum',
+                modalDescription: 'Pastikan semua kelengkapan ujian Anda siap!',
+                checklistItems: [
+                    'Cek Kelengkapan Alat & Bahan praktikum.',
+                    'Pahami prosedur dan tujuan setiap percobaan.',
+                    'Siapkan alat tulis dan lembar jawaban.',
+                    'Pastikan koneksi internet stabil (jika online).'
+                ],
+                modalButtons: [
+                    { text: 'Link Modul Praktikum', type: 'primary', action: 'link', url: 'https://www.google.com/search?q=modul+ujian+praktikum' }
+                ]
+            }
+        ];
+
+        function formatDate(dateStr, timeStr) {
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            // Adjust date and time to be interpreted as WIB (GMT+7)
+            const date = new Date(dateStr + 'T' + timeStr + ':00+07:00'); // Explicitly set timezone to WIB
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            const time = timeStr + ' WIB';
+            
+            return `${dayName}, ${day} ${month} ${year} - ${time}`;
+        }
+
+        function getTimeRemaining(targetDate) {
+            const now = new Date();
+            const target = new Date(targetDate);
+            const diff = target - now;
+
+            if (diff <= 0) {
+                return { expired: true };
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            return { days, hours, minutes, seconds, expired: false };
+        }
+
+        function getCardClass(targetDate) {
+            const now = new Date();
+            const target = new Date(targetDate);
+            const diff = target - now;
+            const hoursRemaining = diff / (1000 * 60 * 60);
+
+            if (diff <= 0) return 'urgent'; // Merah jika sudah lewat
+            if (hoursRemaining <= 24) return 'warning'; // Oranye jika kurang dari 24 jam
+            return 'normal'; // Hijau jika masih lama
+        }
+
+        function getStatusInfo(targetDate) {
+            const now = new Date();
+            const target = new Date(targetDate);
+            const diff = target - now;
+            const hoursRemaining = diff / (1000 * 60 * 60);
+            
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, -1); // End of today
+
+            if (diff <= 0) return { class: 'expired', text: 'BERAKHIR' };
+            
+            if (target >= startOfToday && target <= endOfToday) return { class: 'today', text: 'HARI INI' };
+            
+            return { class: 'upcoming', text: 'MENDATANG' };
+        }
+
+        function formatCountdown(timeObj) {
+            if (timeObj.expired) {
+                return {
+                    time: '0j 0m 0d', // Display 0s instead of BERAKHIR for consistency
+                    label: 'Waktu telah habis'
+                };
+            }
+
+            let timeStr = '';
+            let labelStr = '';
+
+            if (timeObj.days > 0) {
+                timeStr = `${timeObj.days}h ${timeObj.hours}j ${timeObj.minutes}m`;
+                labelStr = 'hari jam menit tersisa';
+            } else if (timeObj.hours > 0) {
+                timeStr = `${timeObj.hours}j ${timeObj.minutes}m ${timeObj.seconds}d`;
+                labelStr = 'jam menit detik tersisa';
+            } else {
+                timeStr = `${timeObj.minutes}m ${timeObj.seconds}d`;
+                labelStr = 'menit detik tersisa';
+            }
+
+            return { time: timeStr, label: labelStr };
+        }
+
+        function showModal(reminder) {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const modalChecklist = document.getElementById('modalChecklist');
+            const modalButtons = document.getElementById('modalButtons');
+
+            modalTitle.textContent = reminder.modalTitle;
+            modalDescription.textContent = reminder.modalDescription || ''; // Display description if exists
+
+            modalChecklist.innerHTML = '';
+            if (reminder.checklistItems && reminder.checklistItems.length > 0) {
+                reminder.checklistItems.forEach((item, index) => {
+                    const checklistItemDiv = document.createElement('div');
+                    checklistItemDiv.className = 'checklist-item';
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `checklist-item-${reminder.id}-${index}`;
+                    // You might want to store checkbox state in localStorage
+                    // For now, it's just a visual toggle
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `checklist-item-${reminder.id}-${index}`;
+                    label.textContent = item;
+
+                    checklistItemDiv.appendChild(checkbox);
+                    checklistItemDiv.appendChild(label);
+                    modalChecklist.appendChild(checklistItemDiv);
+                });
+            }
+
+            modalButtons.innerHTML = '';
+            reminder.modalButtons.forEach(button => {
+                if (button.action === 'link') {
+                    const link = document.createElement('a');
+                    link.href = button.url;
+                    link.target = '_blank';
+                    link.className = `modal-button ${button.type === 'secondary' ? 'secondary' : ''}`;
+                    link.textContent = button.text;
+                    modalButtons.appendChild(link);
+                } else {
+                    const btn = document.createElement('button');
+                    btn.className = `modal-button ${button.type === 'secondary' ? 'secondary' : ''}`;
+                    btn.textContent = button.text;
+                    btn.onclick = () => {
+                        alert(`${button.text} diklik!`);
+                        // You can add more complex logic here, e.g., submitting form
+                    };
+                    modalButtons.appendChild(btn);
+                }
+            });
+
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.remove('show');
+        }
+
+        function createReminderCard(reminder) {
+            const targetDate = new Date(reminder.date + 'T' + reminder.time + ':00+07:00'); // Explicitly set timezone for consistency
+            const timeRemaining = getTimeRemaining(targetDate);
+            const cardClass = getCardClass(targetDate);
+            const statusInfo = getStatusInfo(targetDate);
+            const formattedDate = formatDate(reminder.date, reminder.time);
+            const countdown = formatCountdown(timeRemaining);
+
+            return `
+                <div class="reminder-card ${cardClass}" onclick="showModal(reminders[${reminder.id - 1}])">
+                    <div class="reminder-title">
+                        ${reminder.title}
+                    </div>
+                    <div class="reminder-date">${formattedDate}</div>
+                    <div class="countdown-container">
+                        <div class="countdown-time">${countdown.time}</div>
+                        <div class="countdown-label">${countdown.label}</div>
+                    </div>
+                    <button class="status-button ${statusInfo.class}" onclick="event.stopPropagation(); showModal(reminders[${reminder.id - 1}])">${statusInfo.text}</button>
+                </div>
+            `;
+        }
+
+        function updateReminders() {
+            const container = document.getElementById('remindersContainer');
+            container.innerHTML = reminders.map(reminder => createReminderCard(reminder)).join('');
+        }
+
+        // Event listeners
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Keyboard support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Update setiap detik
+        updateReminders();
+        setInterval(updateReminders, 1000);
+    </script>
+</body>
+</html>
